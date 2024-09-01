@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مولد بطاقات ائتمان عشوائية</title>
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            flex-direction: column;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 90%;
+            max-width: 600px;
+            overflow-y: auto;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .container h1 {
+            color: #007bff;
+            font-size: 26px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        .generate-btn, .copy-btn, .save-btn, .delete-btn, .filter-btn, .search-btn {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 12px 25px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 50px;
+            margin-top: 15px;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+        .generate-btn:hover, .copy-btn:hover, .save-btn:hover, .delete-btn:hover, .filter-btn:hover, .search-btn:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+        select, input[type="number"], input[type="color"], input[type="text"] {
+            padding: 10px;
+            margin-bottom: 15px;
+            font-size: 16px;
+            width: 100%;
+            box-sizing: border-box;
+            border-radius: 50px;
+            border: 1px solid #ddd;
+            transition: border-color 0.3s;
+        }
+        .card-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        .counter {
+            margin-bottom: 20px;
+            color: #343a40;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        table, th, td {
+            border: 1px solid #dee2e6;
+        }
+        th, td {
+            padding: 12px;
+            text-align: center;
+            font-size: 14px;
+        }
+        th {
+            background-color: #007bff;
+            color: #ffffff;
+            cursor: pointer;
+        }
+        .details {
+            display: none;
+            position: absolute;
+            background: #fff;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            font-size: 14px;
+            color: #333;
+        }
+        tr:hover .details {
+            display: block;
+        }
+        .details h4 {
+            margin: 0;
+            font-size: 16px;
+            color: #007bff;
+        }
+        footer {
+            margin-top: 30px;
+            color: #343a40;
+            font-size: 14px;
+        }
+        footer a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        footer a:hover {
+            text-decoration: underline;
+        }
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .theme-toggle:hover {
+            background-color: #0056b3;
+        }
+        .dark-mode {
+            background-color: #1e1e1e;
+            color: #e4e4e4;
+        }
+        .dark-mode .container {
+            background-color: #2c2c2c;
+        }
+        .dark-mode .generate-btn, .dark-mode .copy-btn, .dark-mode .save-btn, .dark-mode .delete-btn, .dark-mode .filter-btn, .dark-mode .search-btn {
+            background-color: #4a4a4a;
+            color: #e4e4e4;
+        }
+        .dark-mode .generate-btn:hover, .dark-mode .copy-btn:hover, .dark-mode .save-btn:hover, .dark-mode .delete-btn:hover, .dark-mode .filter-btn:hover, .dark-mode .search-btn:hover {
+            background-color: #6a6a6a;
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+    <div class="container">
+        <h1>مولد بطاقات ائتمان</h1>
+
+        <div class="counter" id="counter">عدد البطاقات المولدة: 0</div>
+
+        <div class="card-group">
+            <label for="numCards">عدد البطاقات:</label>
+            <input type="number" id="numCards" value="1" min="1" max="10">
+        </div>
+
+        <div class="card-group">
+            <label for="expiryStart">بداية السنة:</label>
+            <input type="number" id="expiryStart" value="2024" min="2024" max="2030">
+        </div>
+
+        <div class="card-group">
+            <label for="expiryEnd">نهاية السنة:</label>
+            <input type="number" id="expiryEnd" value="2030" min="2024" max="2030">
+        </div>
+
+        <div class="card-group">
+            <label for="themeColor">اختر لون الخلفية:</label>
+            <input type="color" id="themeColor" value="#f4f7f6" onchange="changeThemeColor()">
+        </div>
+
+        <button class="generate-btn" onclick="generateCardDetails()">توليد بطاقات</button>
+        <button class="save-btn" onclick="saveCards()">حفظ البطاقات</button>
+        <button class="delete-btn" onclick="deleteAllCards()">حذف جميع البطاقات</button>
+
+        <div class="card-group">
+            <label for="filterYear">تصفية حسب السنة:</label>
+            <input type="number" id="filterYear" min="2024" max="2030">
+            <button class="filter-btn" onclick="filterCards()">تصفية</button>
+        </div>
+
+        <div class="card-group">
+            <label for="searchCard">بحث عن بطاقة:</label>
+            <input type="text" id="searchCard" placeholder="أدخل رقم البطاقة">
+            <button class="search-btn" onclick="searchCard()">بحث</button>
+        </div>
+
+        <table id="cardsTable">
+            <thead>
+                <tr>
+                    <th onclick="sortTable(0)">رقم البطاقة</th>
+                    <th onclick="sortTable(1)">الشهر</th>
+                    <th onclick="sortTable(2)">السنة</th>
+                    <th onclick="sortTable(3)">CVV</th>
+                    <th>نسخ</th>
+                </tr>
+            </thead>
+            <tbody id="cardsContainer"></tbody>
+        </table>
+    </div>
+
+    <footer>
+        <p>تم التطوير بواسطة <a href="https://t.me/lilzr" target="_blank">مصطفى</a></p>
+    </footer>
+
+    <script>
+        let cardCount = 0;
+        let cardsData = [];
+        let darkMode = false;
+
+        function generateCardDetails() {
+            let numCards = parseInt(document.getElementById('numCards').value);
+            let expiryStart = parseInt(document.getElementById('expiryStart').value);
+            let expiryEnd = parseInt(document.getElementById('expiryEnd').value);
+            let cardsContainer = document.getElementById('cardsContainer');
+
+            for (let j = 0; j < numCards; j++) {
+                let cardNumber = '';
+                for (let i = 0; i < 16; i++) {
+                    cardNumber += Math.floor(Math.random() * 10);
+                }
+
+                let expiryMonth = ('0' + Math.floor(Math.random() * 12 + 1)).slice(-2);
+                let expiryYear = Math.floor(Math.random() * (expiryEnd - expiryStart + 1)) + expiryStart;let cvv = Math.floor(Math.random() * 900) + 100;
+
+                let cardDetails = `${cardNumber}|${expiryMonth}|${expiryYear}|${cvv}`;
+                cardsData.push({
+                    cardNumber: cardNumber,
+                    expiryMonth: expiryMonth,
+                    expiryYear: expiryYear,
+                    cvv: cvv
+                });
+
+                let row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${cardNumber}</td>
+                    <td>${expiryMonth}</td>
+                    <td>${expiryYear}</td>
+                    <td>${cvv}</td>
+                    <td><button class="copy-btn" data-card="${cardDetails}">نسخ</button></td>
+                `;
+                cardsContainer.appendChild(row);
+            }
+
+            cardCount += numCards;
+            updateCardCount();
+
+            // إعادة تعيين الأحداث على أزرار النسخ الجديدة
+            document.querySelectorAll('.copy-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    copyCard(this.getAttribute('data-card'));
+                });
+            });
+        }
+
+        function copyCard(cardDetails) {
+            navigator.clipboard.writeText(cardDetails).then(() => {
+                alert('تم نسخ تفاصيل البطاقة!');
+            }).catch(err => {
+                console.error('فشل في نسخ تفاصيل البطاقة: ', err);
+            });
+        }
+
+        function saveCards() {
+            let textFile = '';
+            cardsData.forEach(card => {
+                textFile += `${card.cardNumber}|${card.expiryMonth}|${card.expiryYear}|${card.cvv}\n`;
+            });
+
+            let blob = new Blob([textFile], { type: 'text/plain' });
+            let url = URL.createObjectURL(blob);
+            let a = document.createElement('a');
+            a.href = url;
+            a.download = 'cards.txt';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function deleteAllCards() {
+            cardsData = [];
+            document.getElementById('cardsContainer').innerHTML = '';
+            cardCount = 0;
+            updateCardCount();
+        }
+
+        function filterCards() {
+            let year = document.getElementById('filterYear').value;
+            let filteredCards = cardsData.filter(card => card.expiryYear == year);
+            displayCards(filteredCards);
+        }
+
+        function searchCard() {
+            let searchValue = document.getElementById('searchCard').value;
+            let foundCard = cardsData.find(card => card.cardNumber === searchValue);
+            let cardsContainer = document.getElementById('cardsContainer');
+            cardsContainer.innerHTML = '';
+
+            if (foundCard) {
+                let row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${foundCard.cardNumber}</td>
+                    <td>${foundCard.expiryMonth}</td>
+                    <td>${foundCard.expiryYear}</td>
+                    <td>${foundCard.cvv}</td>
+                    <td><button class="copy-btn" data-card="${foundCard.cardNumber}|${foundCard.expiryMonth}|${foundCard.expiryYear}|${foundCard.cvv}">نسخ</button></td>
+                `;
+                cardsContainer.appendChild(row);
+            } else {
+                cardsContainer.innerHTML = '<tr><td colspan="5">لم يتم العثور على بطاقة</td></tr>';
+            }
+        }
+
+        function updateCardCount() {
+            document.getElementById('counter').textContent = `عدد البطاقات المولدة: ${cardCount}`;
+        }
+
+        function sortTable(n) {
+            let table = document.getElementById('cardsTable');
+            let rows = Array.from(table.querySelectorAll('tbody tr'));
+            let switching = true;
+            let shouldSwitch, i;
+            let direction = 'asc';
+            let switchCount = 0;
+
+            while (switching) {
+                switching = false;
+
+                for (i = 0; i < rows.length - 1; i++) {
+                    shouldSwitch = false;
+                    let x = rows[i].getElementsByTagName('td')[n];
+                    let y = rows[i + 1].getElementsByTagName('td')[n];
+
+                    if (direction === 'asc') {
+                        if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                            shouldSwitch = true;
+                            break;
+                        }
+                    } else if (direction === 'desc') {
+                        if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+                            shouldSwitch = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (shouldSwitch) {
+                    rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                    switching = true;
+                    switchCount++;
+                } else {
+                    if (switchCount === 0 && direction === 'asc') {
+                        direction = 'desc';
+                        switching = true;
+                    }
+                }
+            }
+        }
+
+        function changeThemeColor() {
+            let color = document.getElementById('themeColor').value;
+            document.body.style.backgroundColor = color;
+        }
+
+        function toggleTheme() {
+            let body = document.body;
+            let themeToggle = document.querySelector('.theme-toggle');
+            if (darkMode) {
+                body.classList.remove('dark-mode');
+                themeToggle.textContent = '🌙';
+            } else {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '🌞';
+            }
+            darkMode = !darkMode;
+        }
+    </script>
+</body>
+</html>
